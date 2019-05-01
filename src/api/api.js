@@ -4,6 +4,8 @@ const api = axios.create({
   baseURL: 'http://stupidhack.kulap.io:3000/api/v1/',
 })
 
+const sleep = m => new Promise(r => setTimeout(r, m))
+
 export const getChairs = async () => {
   try {
     const { data } = await api.get('leader-board')
@@ -28,13 +30,7 @@ export const getParty = async id => {
   }
 }
 
-export const bid = async (pid, cid, price, isWin) => {
-  if (!(pid && pid - 0 === Math.floor(pid - 0) && pid - 0 >= 1 && pid - 0 <= 7))
-    return
-  if (!(cid && cid - 0 === Math.floor(cid - 0) && cid - 0 >= 1 && cid - 0 <= 5))
-    return
-  const diff = isWin ? 0 : 10
-  api.post(`bid?partyId=${pid}&chairId=${cid}&amount=${price + diff - 0}`)
+export const answer = async (qId, ans, player) => {
+  await sleep(1000)
+  return Math.random() < 0.5 ? 'correct' : 'wrong'
 }
-
-window.aucbid = bid

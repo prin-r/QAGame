@@ -11,4 +11,5 @@ export default {
   peru: '#CB5E30',
   sienna: '#8C6A2A',
   brick: '#AE511F',
+  leaves: '#506D2F',
 }
