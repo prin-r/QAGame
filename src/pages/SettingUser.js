@@ -37,8 +37,9 @@ export default ({ match }) => {
   const [newUserName, setNewUserName] = useState('')
 
   useEffect(() => {
-    setKey(localStorage.getItem(match.params.id))
-    ;(async () => setUsers(await getUsers()))()
+    const adminKey = localStorage.getItem(match.params.id)
+    setKey(adminKey)
+    ;(async () => setUsers((await getUsers(adminKey)) || []))()
   }, [])
 
   return (
@@ -55,7 +56,7 @@ export default ({ match }) => {
           <Flex mx="5px" />
           <Button
             style={{ minHeight: '35px', minWidth: '35px' }}
-            onClick={() => addUser(newUserName, key)}
+            onClick={() => addUser(key, newUserName)}
           >
             <i className="fas fa-plus" />
           </Button>

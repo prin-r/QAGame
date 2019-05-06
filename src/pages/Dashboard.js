@@ -113,11 +113,11 @@ export default ({ match }) => {
         </Flex>
       </Flex>
       <Flex mt="60px" px="20px" flexDirection="column" width={1}>
-        {questions.map((question, i) => (
+        {questions.map((each, i) => (
           <QuestionTab
-            playerKey={player + '_' + salt}
-            question={question}
-            qId={i + 1}
+            player={player + '_' + salt}
+            question={each.question}
+            qId={each.qId}
             key={i}
           />
         ))}

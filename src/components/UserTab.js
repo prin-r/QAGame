@@ -41,7 +41,7 @@ export default props => {
   const [hides, setHides] = useState([true, true, true])
 
   useEffect(() => {
-    setName(props.name)
+    setName(props.user)
     setKey(props.userKey)
     setPoint(props.point)
   }, [])

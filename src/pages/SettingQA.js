@@ -36,8 +36,9 @@ export default ({ match }) => {
   const [qas, setQas] = useState([])
 
   useEffect(() => {
-    setKey(localStorage.getItem(match.params.id))
-    ;(async () => setQas(await getQAs()))()
+    const adminKey = localStorage.getItem(match.params.id)
+    setKey(adminKey)
+    ;(async () => setQas(await getQAs(adminKey)))()
   }, [])
 
   return (
@@ -56,7 +57,7 @@ export default ({ match }) => {
       </Flex>
       <Flex flexDirection="column">
         {qas.map((qa, i) => (
-          <QATab adminKey={key} q={qa.q} a={qa.a} qId={i + 1} key={i} />
+          <QATab adminKey={key} q={qa.q} a={qa.a} qId={qa.qId} key={i} />
         ))}
       </Flex>
     </Flex>

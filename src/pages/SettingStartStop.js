@@ -26,9 +26,9 @@ export default ({ match }) => {
   const toggle = async () => {
     console.log(key)
     if (startTime > 0) {
-      await stop()
+      await stop(key)
     } else {
-      await start()
+      await start(key)
     }
     setStartTime(getStartTime())
   }

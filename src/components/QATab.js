@@ -39,8 +39,9 @@ export default ({ adminKey, q, a, qId }) => {
   const [ans, setAns] = useState(a)
 
   const submit = async () => {
+    const answer = ans.split(',').map(x => x.trim())
     setWaiting(true)
-    setResult(await setQA(adminKey, qId, qt, ans))
+    setResult(await setQA(adminKey, qId, answer))
     setWaiting(false)
   }
 
