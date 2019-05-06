@@ -4,7 +4,7 @@ import { Flex, Box, Text } from 'rebass'
 export default props => (
   <Flex flexDirection="column" alignItems="center">
     <Box my={4}>
-      <Text fontWeight={600} fontSize={24}>
+      <Text onClick={() => console.log(props)} fontWeight={600} fontSize={24}>
         404: You've wondered too far!
       </Text>
     </Box>

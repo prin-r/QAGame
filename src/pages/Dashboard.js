@@ -3,6 +3,7 @@ import { Flex } from 'rebass'
 import Loadable from 'react-loadable'
 import Loading from '../components/Loading'
 import colors from '../ui/colors'
+import { getQs, verifyKey } from '../api/api'
 
 const QuestionTab = Loadable({
   loader: () => import('../components/QuestionTab'),
@@ -13,26 +14,51 @@ const QuestionTab = Loadable({
   ),
 })
 
+const Input = Loadable({
+  loader: () => import('../components/Input'),
+  loading: () => (
+    <Flex justifyContent="center" alignItems="center" flex={1}>
+      <Loading />
+    </Flex>
+  ),
+})
+
+const Button = Loadable({
+  loader: () => import('../components/Button'),
+  loading: () => (
+    <Flex justifyContent="center" alignItems="center" flex={1}>
+      <Loading />
+    </Flex>
+  ),
+})
+
 export default ({ match }) => {
   const [questions, setQuestions] = useState([])
+
+  const [isKeyShowed, setIsKeyShowed] = useState(false)
   const [player, setPlayer] = useState(null)
+  const [salt, setSalt] = useState(null)
+  const [verificationResult, setVerificationResult] = useState(null)
+  const [waiting, setWaiting] = useState(false)
 
   useEffect(() => {
     setPlayer(match.path.slice(1))
-    setQuestions([
-      'When you are old, what do you think children will ask you to tell stories about?',
-      'If you could switch two movie characters, what switch would lead to the most inappropriate movies?',
-      'What animal would be cutest if scaled down to the size of a cat?',
-      'What inanimate object would be the most annoying if it played loud upbeat music while being used?',
-      'When did something start out badly for you but in the end, it was greatbadly for you but in the end, it was greatbadly for you but in the end, it was greatbadly for you but in the end, it was great?',
-    ])
+    ;(async () => setQuestions(await getQs()))()
   }, [])
+
+  const onVerifyKey = async () => {
+    setWaiting(true)
+    setVerificationResult(await verifyKey(player + '_' + salt))
+    setWaiting(false)
+  }
 
   return (
     <Flex flexDirection="column" width={1} flex={1}>
       <Flex
+        p="20px"
         width={1}
         alignItems="center"
+        bg={colors.lightSteel}
         style={{
           zIndex: '1',
           height: '60px',
@@ -40,33 +66,56 @@ export default ({ match }) => {
           boxShadow: `0 7px 9px 0 grey`,
         }}
       >
-        <Flex flex={1} p="20px" bg={colors.lightBlue} color="white">
-          <marquee>
-            Band Protocol is a protocol for decentralized data governance on the
-            Ethereum blockchain. Using various token economics, the protocol
-            incentivizes multiple independent parties to work cooperatively to
-            provide trusted data. Curated information is available on-chain,
-            ready to be consumed by other blockchain protocols or decentralized
-            applications. Band Protocol serves as the data layer of the Web3
-            ecosystem, bridging real world and/or subjective information to the
-            smart contract world.
-          </marquee>
+        <Flex
+          flex={1}
+          style={{ height: '35px', position: 'relative' }}
+          alignItems="center"
+        >
+          <Input
+            type={isKeyShowed ? 'text' : 'password'}
+            style={{ width: '100%' }}
+            onChange={({ target }) => setSalt(target.value)}
+          />
+          <Button
+            style={{ position: 'absolute', right: '10px', padding: '5px 10px' }}
+            onClick={() => setIsKeyShowed(!isKeyShowed)}
+          >
+            {isKeyShowed ? (
+              <i className="fas fa-eye-slash" />
+            ) : (
+              <i className="fas fa-eye" />
+            )}
+          </Button>
         </Flex>
-        <Flex flex={1} p="20px" bg={colors.seaGreen} color="white">
-          <marquee>
-            CoinHatcher is the Bloomberg of Crypto. Coinhatcher is a
-            decentralized data curation with a mission to provide trusted and
-            reliable information in blockchain industry. Ranging from daily news
-            to founder’s directory and crypto economics, Coinhatcher has you
-            covered! Tokens are given as reward and are used to curate reliable
-            information through TCR mechanism.
-          </marquee>
+        <Flex
+          flex={1}
+          style={{ height: '35px', position: 'relative' }}
+          justifyContent="flex-end"
+        >
+          {!waiting && verificationResult && (
+            <Flex
+              bg="gray"
+              style={{ width: '75px', borderRadius: '4px' }}
+              justifyContent="center"
+              alignItems="center"
+            >
+              {verificationResult}
+            </Flex>
+          )}
+          {waiting && (
+            <Flex style={{ position: 'absolute', top: '-40px', right: '64px' }}>
+              <Loading size="128px" />
+            </Flex>
+          )}
+          <Flex ml="20px">
+            <Button onClick={onVerifyKey}>verify</Button>
+          </Flex>
         </Flex>
       </Flex>
       <Flex mt="60px" px="20px" flexDirection="column" width={1}>
         {questions.map((question, i) => (
           <QuestionTab
-            player={player}
+            playerKey={player + '_' + salt}
             question={question}
             qId={i + 1}
             key={i}

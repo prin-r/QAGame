@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Flex, Text } from 'rebass'
 import colors from '../ui/colors'
-import { answer } from '../api/api'
+import { setQA } from '../api/api'
 import Loadable from 'react-loadable'
 import Loading from './Loading'
 
@@ -32,28 +32,27 @@ const Card = Loadable({
   ),
 })
 
-export default ({ question, player, qId }) => {
+export default ({ adminKey, q, a, qId }) => {
   const [waiting, setWaiting] = useState(false)
   const [result, setResult] = useState(false)
-  const [ans, setAns] = useState('')
+  const [qt, setQt] = useState(q)
+  const [ans, setAns] = useState(a)
 
   const submit = async () => {
-    ;(async () => setWaiting(true))()
-    setResult(await answer(qId, ans, player))
-    ;(async () => setWaiting(false))()
-    setAns('')
+    setWaiting(true)
+    setResult(await setQA(adminKey, qId, qt, ans))
+    setWaiting(false)
   }
 
   return (
     <Card>
-      <Flex mb="30px">
-        <Text color={colors.darkGreen}>{`${qId}. ${question}`}</Text>
-      </Flex>
+      <Input value={qt} onChange={({ target }) => setQt(target.value)} />
+      <Flex my="10px" />
       <Input value={ans} onChange={({ target }) => setAns(target.value)} />
       <Flex mt="10px" alignItems="center" style={{ height: '35px' }}>
         <Flex style={{ height: '35px' }}>
           <Button bg={colors.oliveGreen} onClick={submit}>
-            submit answer
+            set
           </Button>
         </Flex>
         {waiting && (

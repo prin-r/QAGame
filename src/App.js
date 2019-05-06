@@ -16,8 +16,18 @@ const Dashboard = Loadable({
   loading: () => <Loading />,
 })
 
-const Setting = Loadable({
-  loader: () => import('./pages/Setting'),
+const SettingQA = Loadable({
+  loader: () => import('./pages/SettingQA'),
+  loading: () => <Loading />,
+})
+
+const SettingStartStop = Loadable({
+  loader: () => import('./pages/SettingStartStop'),
+  loading: () => <Loading />,
+})
+
+const SettingUser = Loadable({
+  loader: () => import('./pages/SettingUser'),
   loading: () => <Loading />,
 })
 
@@ -40,8 +50,10 @@ export default () => (
   <PageContainer>
     <Router>
       <Switch>
-        <Route exact path="/status" component={Status} />
-        <Route exact path="/undefined" component={Setting} />
+        <Route exact path="/status/:id" component={Status} />
+        <Route exact path="/setting/qa/:id" component={SettingQA} />
+        <Route exact path="/setting/ss/:id" component={SettingStartStop} />
+        <Route exact path="/setting/user/:id" component={SettingUser} />
         <Route exact path="/swit" component={Dashboard} />
         <Route exact path="/peach" component={Dashboard} />
         <Route exact path="/bun" component={Dashboard} />

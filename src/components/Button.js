@@ -20,4 +20,9 @@ export default styled(Button)`
     box-shadow: 0 0px 0px 0 ${colors.oliveBrown};
     transform: scale(0.95);
   }
+
+  @media only screen and (max-width: 500px) {
+    padding: 0px 5px;
+    font-size: 12px;
+  }
 `
