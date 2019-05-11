@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Flex, Text } from 'rebass'
 import Loadable from 'react-loadable'
 import Loading from '../components/Loading'
-import { getQAs } from '../api/api'
+import { getQAs, addQA } from '../api/api'
 
 const QATab = Loadable({
   loader: () => import('../components/QATab'),
@@ -34,12 +34,19 @@ const Button = Loadable({
 export default ({ match }) => {
   const [key, setKey] = useState('')
   const [qas, setQas] = useState([])
+  const [question, setQuestion] = useState('')
 
   useEffect(() => {
     const adminKey = localStorage.getItem(match.params.id)
     setKey(adminKey)
     ;(async () => setQas(await getQAs(adminKey)))()
   }, [])
+
+  const addQuestion = async () => {
+    console.warn(key, question)
+    await addQA(key, question)
+    window.location.reload()
+  }
 
   return (
     <Flex flexDirection="column" width={1} p="20px">
@@ -48,9 +55,15 @@ export default ({ match }) => {
         <Flex width={1} justifyContent="center" alignItems="center">
           <Text>New Question</Text>
           <Flex mx="5px" />
-          <Input />
+          <Input
+            value={question}
+            onChange={({ target }) => setQuestion(target.value)}
+          />
           <Flex mx="5px" />
-          <Button style={{ minHeight: '35px', minWidth: '35px' }}>
+          <Button
+            style={{ minHeight: '35px', minWidth: '35px' }}
+            onClick={addQuestion}
+          >
             <i className="fas fa-plus" />
           </Button>
         </Flex>

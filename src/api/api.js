@@ -33,6 +33,20 @@ export const verifyKey = async key => {
   }
 }
 
+export const addQA = async (adminKey, question) => {
+  try {
+    const { data } = await api.post(
+      'questions',
+      { question, answer: ['set this answer'] },
+      { headers: { adminKey } },
+    )
+    return data.result
+  } catch (err) {
+    console.error(err)
+    return err.response.data.message
+  }
+}
+
 export const setQA = async (adminKey, qId, a) => {
   try {
     const { data } = await api.patch(

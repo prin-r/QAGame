@@ -47,7 +47,7 @@ export default ({ question, player, qId }) => {
   return (
     <Card>
       <Flex mb="30px">
-        <Text color={colors.darkGreen}>{`${qId}. ${question}`}</Text>
+        <Text color={colors.darkGreen}>{`${question}`}</Text>
       </Flex>
       <Input value={ans} onChange={({ target }) => setAns(target.value)} />
       <Flex mt="10px" alignItems="center" style={{ height: '35px' }}>

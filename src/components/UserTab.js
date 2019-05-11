@@ -79,7 +79,7 @@ export default props => {
           )}
         </Button>
       </Flex>
-      <Flex
+      {/* <Flex
         flexDirection="row"
         alignItems="center"
         style={{ position: 'relative' }}
@@ -103,7 +103,7 @@ export default props => {
             <i className="fas fa-eye" />
           )}
         </Button>
-      </Flex>
+      </Flex> */}
       <Flex
         flexDirection="row"
         alignItems="center"
