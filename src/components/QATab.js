@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Flex, Text } from 'rebass'
 import colors from '../ui/colors'
-import { setQA } from '../api/api'
+import { setQA, removeQA } from '../api/api'
 import Loadable from 'react-loadable'
 import Loading from './Loading'
 
@@ -39,9 +39,21 @@ export default ({ adminKey, q, a, qId }) => {
   const [ans, setAns] = useState(a)
 
   const submit = async () => {
+    if (waiting) {
+      return
+    }
     const answer = ans.split(',').map(x => x.trim())
     setWaiting(true)
     setResult(await setQA(adminKey, qId, answer))
+    setWaiting(false)
+  }
+
+  const remove = async () => {
+    if (waiting) {
+      return
+    }
+    setWaiting(true)
+    setResult(await removeQA(adminKey, qId))
     setWaiting(false)
   }
 
@@ -54,6 +66,11 @@ export default ({ adminKey, q, a, qId }) => {
         <Flex style={{ height: '35px' }}>
           <Button bg={colors.oliveGreen} onClick={submit}>
             set
+          </Button>
+        </Flex>
+        <Flex style={{ height: '35px' }}>
+          <Button bg={colors.oliveGreen} onClick={remove}>
+            remove {qId}
           </Button>
         </Flex>
         {waiting && (

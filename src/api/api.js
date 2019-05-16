@@ -15,6 +15,17 @@ Array.prototype.shuffle = function() {
 
 const sleep = m => new Promise(r => setTimeout(r, m))
 
+export const removeQA = async (adminKey, qId) => {
+  console.log(adminKey)
+  try {
+    const { data } = await api.delete('questions', { headers: { adminKey } })
+    return data.result
+  } catch (err) {
+    console.error(err)
+    return err.response.data.message
+  }
+}
+
 export const getStartTime = () => {
   const stTmp = parseInt(JSON.parse(localStorage.getItem('startTime')))
   if (Number.isInteger(stTmp)) {
