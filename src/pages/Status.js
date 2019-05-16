@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Flex } from 'rebass'
 import { useInterval } from '../utils/useInterval'
-import { getStartTime, getUsers } from '../api/api'
+import { getStartTime, getUsers, getQAs } from '../api/api'
 import colors from '../ui/colors'
 
 export default ({ match }) => {
   const [users, setUsers] = useState([])
+  const [qas, setQas] = useState([])
   const [startTime, setStartTime] = useState(0)
   const [since, setSince] = useState(0)
   const [key, setKey] = useState('')
@@ -14,6 +15,13 @@ export default ({ match }) => {
     ;(async () => {
       if (startTime > 0) {
         setSince(Date.now() - startTime)
+        setUsers(
+          ((await getUsers(key)) || []).sort((a, b) => {
+            if (a.user > b.user) return 1
+            if (a.user < b.user) return -1
+            return 0
+          }),
+        )
       }
     })()
   }, 1000)
@@ -22,22 +30,32 @@ export default ({ match }) => {
     setStartTime(getStartTime())
     const adminKey = localStorage.getItem(match.params.id)
     setKey(adminKey)
-    ;(async () =>
+    ;(async () => {
+      setQas(await getQAs(adminKey))
       setUsers(
         ((await getUsers(adminKey)) || []).sort((a, b) => {
           if (a.user > b.user) return 1
           if (a.user < b.user) return -1
           return 0
         }),
-      ))()
+      )
+    })()
   }, [])
 
   const createStatus = user => {
     const name = user.user
-    // console.log(user)
+    const qas = {}
+    for (const ans of user.answer) {
+      const k = ans[ans.length - 1]
+      if (!qas[k]) {
+        qas[k] = []
+      }
+      qas[k] = qas[k].concat([ans.slice(0, ans.length - 1)])
+    }
+
     return {
       name: name.substr(0, name.indexOf('_')),
-      answers: user.answer,
+      qas: qas,
       numAns: user.answer.length,
       point: user.point,
     }
@@ -53,7 +71,7 @@ export default ({ match }) => {
     >
       <Flex mb="30px">Time Counter : {Math.floor(since / 1000)} seconds</Flex>
       {users.map((user, i) => {
-        const { name, answers, numAns, point } = createStatus(user)
+        const { name, qas, numAns, point } = createStatus(user)
         return (
           <Flex
             key={i}
@@ -74,11 +92,28 @@ export default ({ match }) => {
               </Flex>
             </Flex>
             <Flex width={1} flexDirection="column">
-              {answers.map((ans, i) => {
+              {Object.keys(qas).map((q, i) => {
                 return (
-                  <Flex key={i} mx="20px" bg={colors.tan}>
-                    answer :{ans}
-                  </Flex>
+                  <React.Fragment key={i}>
+                    <Flex mx="20px" bg={colors.slateGray}>
+                      quesion: {q} <br />
+                      answer :
+                    </Flex>
+                    <Flex flexDirection="column">
+                      {qas[q].map((a, j) => {
+                        return (
+                          <Flex
+                            fontSize={12}
+                            mx="40px"
+                            bg={colors.tan}
+                            key={j + q}
+                          >
+                            {JSON.stringify(a)}
+                          </Flex>
+                        )
+                      })}
+                    </Flex>
+                  </React.Fragment>
                 )
               })}
             </Flex>
