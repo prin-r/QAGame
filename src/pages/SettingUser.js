@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Flex, Text } from 'rebass'
 import Loadable from 'react-loadable'
 import Loading from '../components/Loading'
-import { addUser, getUsers } from '../api/api'
+import { addUser, getUsers, clearAnswer } from '../api/api'
 
 const UserTab = Loadable({
   loader: () => import('../components/UserTab'),
@@ -61,6 +61,13 @@ export default ({ match }) => {
             <i className="fas fa-plus" />
           </Button>
         </Flex>
+        <Button
+          mt="15px"
+          style={{ minHeight: '35px', minWidth: '35px' }}
+          onClick={() => clearAnswer(key)}
+        >
+          Clear User Answer
+        </Button>
       </Flex>
       <Flex flexDirection="column">
         {users.map((user, i) => (

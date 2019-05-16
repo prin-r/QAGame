@@ -16,9 +16,10 @@ Array.prototype.shuffle = function() {
 const sleep = m => new Promise(r => setTimeout(r, m))
 
 export const removeQA = async (adminKey, qId) => {
-  console.log(adminKey)
   try {
-    const { data } = await api.delete('questions', { headers: { adminKey } })
+    const { data } = await api.delete(`questions/${qId}`, {
+      headers: { adminKey },
+    })
     return data.result
   } catch (err) {
     console.error(err)
@@ -148,6 +149,16 @@ export const answer = async (qId, ans, player) => {
       answer: ans.split(',').map(x => x.trim()),
       user: player,
     })
+    return data.result
+  } catch (err) {
+    return err.response.data.message
+  }
+}
+
+export const clearAnswer = async adminKey => {
+  try {
+    const { data } = await api.post('reset', {}, { headers: { adminKey } })
+    alert(data.result)
     return data.result
   } catch (err) {
     return err.response.data.message
