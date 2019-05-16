@@ -34,6 +34,7 @@ export default ({ match }) => {
 
   const createStatus = user => {
     const name = user.user
+    // console.log(user)
     return {
       name: name.substr(0, name.indexOf('_')),
       answers: user.answer,

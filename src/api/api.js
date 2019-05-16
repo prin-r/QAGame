@@ -35,6 +35,20 @@ export const getStartTime = () => {
   return 0
 }
 
+export const getStatus = async () => {
+  try {
+    const {
+      data: {
+        result: { gameState },
+      },
+    } = await api.get('status')
+    console.log(gameState)
+    return gameState
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 export const verifyKey = async key => {
   try {
     const { data } = await api.get(`verify/${key}`)

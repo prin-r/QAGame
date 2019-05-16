@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Flex } from 'rebass'
 import Loadable from 'react-loadable'
 import Loading from '../components/Loading'
-import { start, stop, getStartTime } from '../api/api'
+import { start, stop, getStatus } from '../api/api'
 
 const Button = Loadable({
   loader: () => import('../components/Button'),
@@ -15,27 +15,27 @@ const Button = Loadable({
 
 export default ({ match }) => {
   const [key, setKey] = useState('')
-  const [startTime, setStartTime] = useState(0)
+  const [status, setStatus] = useState('')
 
   useEffect(() => {
-    setStartTime(getStartTime())
-
     setKey(localStorage.getItem(match.params.id))
+    ;(async () => setStatus(await getStatus()))()
   }, [])
 
   const toggle = async () => {
-    console.log(key)
-    if (startTime > 0) {
+    const tmpStatus = await getStatus()
+    // console.log(key, tmpStatus)
+    if (tmpStatus === 'start') {
       await stop(key)
     } else {
       await start(key)
     }
-    setStartTime(getStartTime())
+    setStatus(await getStatus())
   }
 
   return (
     <Flex flexDirection="column" width={1} flex={1} p="20px">
-      <Button onClick={toggle}>{startTime > 0 ? 'Stop' : 'Start'}</Button>
+      <Button onClick={toggle}>{status}</Button>
     </Flex>
   )
 }
