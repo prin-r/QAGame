@@ -39,7 +39,14 @@ export default ({ match }) => {
   useEffect(() => {
     const adminKey = localStorage.getItem(match.params.id)
     setKey(adminKey)
-    ;(async () => setUsers((await getUsers(adminKey)) || []))()
+    ;(async () =>
+      setUsers(
+        ((await getUsers(adminKey)) || []).sort((a, b) => {
+          if (a.user > b.user) return 1
+          if (a.user < b.user) return -1
+          return 0
+        }),
+      ))()
   }, [])
 
   return (

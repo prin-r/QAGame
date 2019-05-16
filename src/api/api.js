@@ -59,11 +59,11 @@ export const addQA = async (adminKey, question) => {
   }
 }
 
-export const setQA = async (adminKey, qId, a) => {
+export const setQA = async (adminKey, qId, q, a) => {
   try {
     const { data } = await api.patch(
       'questions',
-      { qId, answer: a },
+      { qId, question: q, answer: a },
       { headers: { adminKey } },
     )
     return data.result
@@ -122,12 +122,21 @@ export const addUser = async (adminKey, userName) => {
   }
 }
 
-export const updateUser = async (adminKey, userName, key, remainingPoint) => {
-  // try {
-  //   const {data} = await api.patch('user', {oldUser})
-  // }
-  await sleep(1000)
-  return Math.random() < 0.5 ? 'success' : 'fail'
+export const updateUser = async (adminKey, oldUserName, newUserName) => {
+  try {
+    const { data } = await api.patch(
+      'user',
+      {
+        newUser: oldUserName,
+        oldUser: newUserName,
+      },
+      { headers: { adminKey } },
+    )
+    return data.result
+  } catch (err) {
+    console.error(err)
+    return err.response.data.message
+  }
 }
 
 export const start = async adminKey => {

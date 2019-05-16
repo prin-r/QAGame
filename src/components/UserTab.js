@@ -35,20 +35,19 @@ const Card = Loadable({
 export default props => {
   const [waiting, setWaiting] = useState(false)
   const [name, setName] = useState('')
-  const [key, setKey] = useState('')
   const [point, setPoint] = useState('')
   const [result, setResult] = useState(false)
   const [hides, setHides] = useState([true, true, true])
 
   useEffect(() => {
     setName(props.user)
-    setKey(props.userKey)
     setPoint(props.point)
+    console.log(props)
   }, [])
 
   const submit = async () => {
     setWaiting(true)
-    setResult(await updateUser(props.adminKey, name, key, point))
+    setResult(await updateUser(props.adminKey, name, props.user))
     setWaiting(false)
   }
 

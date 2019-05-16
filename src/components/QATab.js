@@ -36,20 +36,22 @@ export default ({ adminKey, q, a, qId }) => {
   const [waiting, setWaiting] = useState(false)
   const [result, setResult] = useState(false)
   const [qt, setQt] = useState(q)
-  const [ans, setAns] = useState(a)
+  const [ans, setAns] = useState(a.reduce((a, b) => a + ',' + b))
 
   const submit = async () => {
     if (waiting) {
+      console.log('waiting')
       return
     }
     const answer = ans.split(',').map(x => x.trim())
     setWaiting(true)
-    setResult(await setQA(adminKey, qId, answer))
+    setResult(await setQA(adminKey, qId, qt, answer))
     setWaiting(false)
   }
 
   const remove = async () => {
     if (waiting) {
+      console.log('waiting')
       return
     }
     setWaiting(true)
@@ -68,9 +70,9 @@ export default ({ adminKey, q, a, qId }) => {
             set
           </Button>
         </Flex>
-        <Flex style={{ height: '35px' }}>
+        <Flex ml="20px" style={{ height: '35px' }}>
           <Button bg={colors.oliveGreen} onClick={remove}>
-            remove {qId}
+            remove
           </Button>
         </Flex>
         {waiting && (
