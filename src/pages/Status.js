@@ -6,7 +6,7 @@ import colors from '../ui/colors'
 
 export default ({ match }) => {
   const [users, setUsers] = useState([])
-  const [qas, setQas] = useState([])
+  const [qasT, setQasT] = useState([])
   const [startTime, setStartTime] = useState(0)
   const [since, setSince] = useState(0)
   const [key, setKey] = useState('')
@@ -31,7 +31,13 @@ export default ({ match }) => {
     const adminKey = localStorage.getItem(match.params.id)
     setKey(adminKey)
     ;(async () => {
-      setQas(await getQAs(adminKey))
+      const tmpQAs = await getQAs(adminKey)
+      const mapQAs = {}
+      for (const e of tmpQAs) {
+        mapQAs[e.qId] = { ...e }
+      }
+      setQasT(mapQAs)
+      // console.log(mapQAs)
       setUsers(
         ((await getUsers(adminKey)) || []).sort((a, b) => {
           if (a.user > b.user) return 1
@@ -52,7 +58,6 @@ export default ({ match }) => {
       }
       qas[k] = qas[k].concat([ans.slice(0, ans.length - 1)])
     }
-
     return {
       name: name.substr(0, name.indexOf('_')),
       qas: qas,
@@ -96,8 +101,8 @@ export default ({ match }) => {
                 return (
                   <React.Fragment key={i}>
                     <Flex mx="20px" bg={colors.slateGray}>
-                      quesion: {q} <br />
-                      answer :
+                      quesion: {qasT[q].q} <br />
+                      qid : {q}
                     </Flex>
                     <Flex flexDirection="column">
                       {qas[q].map((a, j) => {
