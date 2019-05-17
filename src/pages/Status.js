@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import { Flex } from 'rebass'
+import Loadable from 'react-loadable'
 import { useInterval } from '../utils/useInterval'
+import Loading from '../components/Loading'
 import { getStartTime, getUsers, getQAs } from '../api/api'
 import colors from '../ui/colors'
+
+const Button = Loadable({
+  loader: () => import('../components/Button'),
+  loading: () => (
+    <Flex justifyContent="center" alignItems="center" flex={1}>
+      <Loading />
+    </Flex>
+  ),
+})
 
 export default ({ match }) => {
   const [users, setUsers] = useState([])
@@ -10,6 +21,8 @@ export default ({ match }) => {
   const [startTime, setStartTime] = useState(0)
   const [since, setSince] = useState(0)
   const [key, setKey] = useState('')
+  const [score, setScore] = useState({})
+  const [qDifficulty, setQDifficulty] = useState({})
 
   useInterval(() => {
     ;(async () => {
@@ -22,6 +35,7 @@ export default ({ match }) => {
             return 0
           }),
         )
+        // calScore()
       }
     })()
   }, 1000)
@@ -66,6 +80,60 @@ export default ({ match }) => {
     }
   }
 
+  const getSort = arr =>
+    arr
+      .map(a => a.toLowerCase())
+      .sort((a, b) => {
+        if (a > b) return 1
+        if (a < b) return -1
+        return 0
+      })
+
+  const calScore = () => {
+    const userCorrectAns = {}
+    const tmpQasT = JSON.parse(JSON.stringify(qasT))
+    for (const u of users) {
+      userCorrectAns[u.user] = []
+      const { qas } = createStatus(u)
+      for (const kq of Object.keys(qas)) {
+        const ansT = getSort(tmpQasT[kq].a)
+        for (const ans of qas[kq]) {
+          const sAns = getSort(ans)
+          if (sAns.join() === ansT.join()) {
+            if (!tmpQasT[kq].d) {
+              tmpQasT[kq].d = 0
+            }
+            tmpQasT[kq].d++
+            userCorrectAns[u.user] = userCorrectAns[u.user].concat([kq])
+            break
+          }
+        }
+      }
+    }
+    const tmpScores = {}
+    const tmpQDiff = {}
+
+    for (const qid of Object.keys(qasT)) {
+      tmpQDiff[qid] = tmpQasT[qid].d > 0 ? 1.0 / tmpQasT[qid].d : 1
+    }
+
+    console.log(tmpQDiff)
+
+    users.map(u => {
+      const qids = userCorrectAns[u.user]
+      let score = 0
+      for (const qid of qids) {
+        if (tmpQasT[qid].d > 0) {
+          score += 1.0 / tmpQasT[qid].d
+        }
+      }
+      tmpScores[u.user] = score
+    })
+    // console.log(score)
+    setQDifficulty(tmpQDiff)
+    setScore(tmpScores)
+  }
+
   return (
     <Flex
       flexDirection="column"
@@ -74,7 +142,12 @@ export default ({ match }) => {
       pt="20px"
       alignItems="center"
     >
-      <Flex mb="30px">Time Counter : {Math.floor(since / 1000)} seconds</Flex>
+      <Flex mb="30px" alignItems="center">
+        Time Counter : {Math.floor(since / 1000)} seconds{' '}
+        <Button onClick={calScore} ml="20px">
+          cal score
+        </Button>
+      </Flex>
       {users.map((user, i) => {
         const { name, qas, numAns, point } = createStatus(user)
         return (
@@ -95,14 +168,18 @@ export default ({ match }) => {
               <Flex flex={1} pl="10px">
                 remaining point:{point}
               </Flex>
+              <Flex flex={1} pl="10px">
+                score:{score[user.user]}
+              </Flex>
             </Flex>
             <Flex width={1} flexDirection="column">
               {Object.keys(qas).map((q, i) => {
                 return (
                   <React.Fragment key={i}>
-                    <Flex mx="20px" bg={colors.slateGray}>
+                    <Flex mx="20px" bg={colors.oliveGreen}>
                       quesion: {qasT[q].q} <br />
-                      qid : {q}
+                      qid : {q} <br />
+                      difficulty: {qDifficulty[q]}
                     </Flex>
                     <Flex flexDirection="column">
                       {qas[q].map((a, j) => {
